@@ -162,7 +162,6 @@ static void setup_button(void)
     const uint32_t BUTTON_SETTLE_MSEC = 20;
 
     init_debounce(&button, &button_pin, BUTTON_SETTLE_MSEC);
-    // button.init(&button_pin, BUTTON_SETTLE_MSEC);
 }
 
 int main(void)
@@ -186,10 +185,14 @@ int main(void)
                 next += 500;
             }
             if (debounce_update(&button)) {
-                if (debounce_is_falling_edge(&button))
+                if (debounce_is_falling_edge(&button)) {
                     gpio_clear(GPIOA, GPIO8);
-                if (debounce_is_rising_edge(&button))
+                    printf("Click-"); fflush(stdout);
+                }
+                if (debounce_is_rising_edge(&button)) {
                     gpio_set(GPIOA, GPIO8);
+                    printf("clack\n");
+                }
             }
         }
 
