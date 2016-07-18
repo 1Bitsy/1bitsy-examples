@@ -19,10 +19,12 @@
 
 #include <stdio.h>
 
-#include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/adc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 
+#include "adc.h"
 #include "console.h"
 #include "debounce.h"
 #include "gpio.h"
@@ -30,6 +32,21 @@
 #include "systick.h"
 
 static debounce button;
+
+static const adc_channel slew_knob = {
+    .adc_adc = ADC1,
+    .adc_channel = 10,
+    .adc_gpio = {
+        .gp_port   = GPIOC,
+        .gp_pin    = GPIO0,
+        .gp_mode   = GPIO_MODE_ANALOG,
+        .gp_pupd   = GPIO_PUPD_NONE,
+        .gp_af     = 0,
+        .gp_ospeed = GPIO_OSPEED_DEFAULT,
+        .gp_otype  = GPIO_OTYPE_DEFAULT,
+        .gp_level  = 0,
+    },
+};
 
 static void setup_clocks(void)
 {
@@ -40,6 +57,9 @@ static void setup_clocks(void)
 
     /* Enable GPIOA, Alternate Function clocks. */
     rcc_periph_clock_enable(RCC_GPIOA);
+
+    /* Enable ADC1 clock. */
+    rcc_periph_clock_enable(RCC_ADC1);
 
     /* Enable I2S clock. */
     RCC_CR |= RCC_CR_PLLI2SON;
@@ -165,6 +185,11 @@ static void setup_button(void)
     init_debounce(&button, &button_pin, BUTTON_SETTLE_MSEC);
 }
 
+static void setup_adcs(void)
+{
+    init_adc_channel(&slew_knob);
+}
+
 int main(void)
 {
     setup_clocks();
@@ -175,16 +200,22 @@ int main(void)
     setup_console_stdio();
     setup_LEDs();
     setup_button();
+    setup_adcs();
 
     printf("Hello, World!\n");
 
     uint32_t next = 500;
+    uint32_t next_adc = 1000;
     while (true) {
+
+        // Red LED blinks.
         uint32_t now = system_millis;
         if (now == next) {
             gpio_toggle(GPIOB, GPIO0);
             next += 500;
         }
+
+        // On-board LED lights when button pressed.
         if (debounce_update(&button)) {
             if (debounce_is_falling_edge(&button)) {
                 gpio_clear(GPIOA, GPIO8);
@@ -194,6 +225,12 @@ int main(void)
                 gpio_set(GPIOA, GPIO8);
                 printf("clack\n");
             }
+        }
+
+        // Slew knob value prints.
+        if (now == next_adc) {
+            printf("ADC = %d\n", adc_read_single(&slew_knob));
+            next_adc += 200;
         }
     }
 
