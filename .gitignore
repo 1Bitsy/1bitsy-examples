@@ -9,5 +9,7 @@
 *.map
 *.stylecheck
 nbproject
+.gdbinit
 .gdb_history
 .DS_Store
+TAGS
