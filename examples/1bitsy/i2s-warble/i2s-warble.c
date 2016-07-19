@@ -30,10 +30,16 @@
 #include "gpio.h"
 #include "i2s.h"
 #include "systick.h"
+#include "warbler.h"
 
-static debounce button;
+static const float F0 = 220.0;
+static const float F1 = 1.2 * 220.0;
 
-static const adc_channel slew_knob = {
+static warbler w1, w2;
+
+static debounce trigger_button;
+
+static const adc_channel slew_knob = { // PC0, ADC1 channel 10
     .adc_adc = ADC1,
     .adc_channel = 10,
     .adc_gpio = {
@@ -65,61 +71,7 @@ static void setup_clocks(void)
     RCC_CR |= RCC_CR_PLLI2SON;
 }
 
-#if 0
-static void tim_setup(void)
-{
-    /* Reset TIM1 peripheral. */
-    timer_reset(TIM1);
-    /* Timer global mode:
-     * - No divider
-     * - Alignment edge
-     * - Direction up
-     */
-    timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    timer_set_prescaler(TIM1, 0);
-    timer_set_repetition_counter(TIM1, 0);
-    /* Enable preload. */
-    timer_disable_preload(TIM1);
-    /* Continous mode. */
-    timer_continuous_mode(TIM1);
-    /* Period (36kHz). */
-    timer_set_period(TIM1, 0xFFFF);
-    /* Disable outputs. */
-    timer_disable_oc_output(TIM1, TIM_OC1);
-    timer_disable_oc_output(TIM1, TIM_OC2);
-    timer_disable_oc_output(TIM1, TIM_OC3);
-    timer_disable_oc_output(TIM1, TIM_OC4);
-
-    timer_set_deadtime(TIM1, 0);
-    timer_set_enabled_off_state_in_idle_mode(TIM1);
-    timer_set_enabled_off_state_in_run_mode(TIM1);
-    timer_disable_break(TIM1);
-    timer_set_break_polarity_high(TIM1);
-    timer_disable_break_automatic_output(TIM1);
-    timer_set_break_lock(TIM1, TIM_BDTR_LOCK_OFF);
-
-    /* -- OC1 configuration -- */
-    /* Configure global mode of line 1. */
-    timer_disable_oc_clear(TIM1, TIM_OC1);
-    timer_enable_oc_preload(TIM1, TIM_OC1);
-    timer_set_oc_slow_mode(TIM1, TIM_OC1);
-    timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
-    timer_set_oc_polarity_high(TIM1, TIM_OC1);
-    timer_set_oc_idle_state_set(TIM1, TIM_OC1);
-    /* Set the capture compare value for OC1 to max value -1 for max
-       duty cycle/brightness. */
-    timer_set_oc_value(TIM1, TIM_OC1, 0xFFFF/2);
-    timer_enable_oc_output(TIM1, TIM_OC1);
-    timer_enable_preload(TIM1);
-    timer_enable_break_main_output(TIM1);
-    /* Counter enable. */
-    timer_enable_counter(TIM1);
-
-}
-#endif
-
-#if 0
-static void i2s_setup(void)
+static void setup_i2s(void)
 {
     static const i2s_config cfg = {
         .i2sc_sample_frequency = 44100,
@@ -137,7 +89,6 @@ static void i2s_setup(void)
 
     init_i2s(&cfg, &inst);
 }
-#endif
 
 static void setup_LEDs(void)
 {
@@ -170,7 +121,7 @@ static void setup_LEDs(void)
 
 static void setup_button(void)
 {
-    static const gpio_pin button_pin = {
+    static const gpio_pin trigger_button_pin = {
         .gp_port   = GPIOB,
         .gp_pin    = GPIO8,
         .gp_mode   = GPIO_MODE_INPUT,
@@ -182,25 +133,31 @@ static void setup_button(void)
     };
     const uint32_t BUTTON_SETTLE_MSEC = 20;
 
-    init_debounce(&button, &button_pin, BUTTON_SETTLE_MSEC);
+    init_debounce(&trigger_button, &trigger_button_pin, BUTTON_SETTLE_MSEC);
 }
 
-static void setup_adcs(void)
+static void setup_knobs(void)
 {
     init_adc_channel(&slew_knob);
+}
+
+static void setup_warblers(void)
+{
+    init_warbler(&w1, F0, F1);
+    init_warbler(&w2, 1.5 * F0, 1.5 * F1);
 }
 
 int main(void)
 {
     setup_clocks();
     setup_systick(168000000);
-    // tim_setup();
-    // i2s_setup();
     setup_console();
     setup_console_stdio();
     setup_LEDs();
     setup_button();
-    setup_adcs();
+    setup_knobs();
+    setup_warblers();
+    setup_i2s();
 
     printf("Hello, World!\n");
 
@@ -215,13 +172,13 @@ int main(void)
             next += 500;
         }
 
-        // On-board LED lights when button pressed.
-        if (debounce_update(&button)) {
-            if (debounce_is_falling_edge(&button)) {
+        // On-board LED lights when trigger button pressed.
+        if (debounce_update(&trigger_button)) {
+            if (debounce_is_falling_edge(&trigger_button)) {
                 gpio_clear(GPIOA, GPIO8);
                 printf("Click-"); fflush(stdout);
             }
-            if (debounce_is_rising_edge(&button)) {
+            if (debounce_is_rising_edge(&trigger_button)) {
                 gpio_set(GPIOA, GPIO8);
                 printf("clack\n");
             }
