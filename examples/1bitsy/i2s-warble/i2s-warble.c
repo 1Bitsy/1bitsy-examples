@@ -20,14 +20,14 @@
 #include <stdio.h>
 
 #include <libopencm3/stm32/adc.h>
-#include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/rcc.h>
-#include <libopencm3/stm32/timer.h>
 
 #include "adc.h"
 #include "console.h"
 #include "debounce.h"
 #include "gpio.h"
+#include "i2c.h"
 #include "i2s.h"
 #include "systick.h"
 #include "warbler.h"
@@ -38,6 +38,8 @@ static const float F1 = 1.2 * 220.0;
 static warbler w1, w2;
 
 static debounce trigger_button;
+
+#define CLOCK_SCALE (rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ])
 
 static const adc_channel slew_knob = { // PC0, ADC1 channel 10
     .adc_adc = ADC1,
@@ -56,19 +58,7 @@ static const adc_channel slew_knob = { // PC0, ADC1 channel 10
 
 static void setup_clocks(void)
 {
-    rcc_clock_setup_hse_3v3(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
-
-    /* Enable TIM1 clock. */
-    rcc_periph_clock_enable(RCC_TIM1);
-
-    /* Enable GPIOA, Alternate Function clocks. */
-    rcc_periph_clock_enable(RCC_GPIOA);
-
-    /* Enable ADC1 clock. */
-    rcc_periph_clock_enable(RCC_ADC1);
-
-    /* Enable I2S clock. */
-    RCC_CR |= RCC_CR_PLLI2SON;
+    rcc_clock_setup_hse_3v3(&CLOCK_SCALE);
 }
 
 static void setup_i2s(void)
@@ -147,6 +137,39 @@ static void setup_warblers(void)
     init_warbler(&w2, 1.5 * F0, 1.5 * F1);
 }
 
+static void setup_i2c(void)
+{
+    static const i2c_config sgtl_i2c = {
+        .i_base_address    = I2C1,
+        .i_own_address     = 32,
+        .i_pins = {
+            {                   // SCL: pin PB6, AF4
+                .gp_port   = GPIOB,
+                .gp_pin    = GPIO6,
+                .gp_mode   = GPIO_MODE_AF,
+                .gp_pupd   = GPIO_PUPD_NONE,
+                .gp_af     = GPIO_AF4,
+                .gp_ospeed = GPIO_OSPEED_50MHZ,
+                .gp_otype  = GPIO_OTYPE_OD,
+                .gp_level  = 1,
+                
+            },
+            {                   // SDA: pin PB7, AF4
+                .gp_port   = GPIOB,
+                .gp_pin    = GPIO7,
+                .gp_mode   = GPIO_MODE_AF,
+                .gp_pupd   = GPIO_PUPD_NONE,
+                .gp_af     = GPIO_AF4,
+                .gp_ospeed = GPIO_OSPEED_50MHZ,
+                .gp_otype  = GPIO_OTYPE_OD,
+                .gp_level  = 1,
+            },
+        },
+    };
+
+    init_i2c(&sgtl_i2c);
+}
+
 int main(void)
 {
     setup_clocks();
@@ -157,20 +180,23 @@ int main(void)
     setup_button();
     setup_knobs();
     setup_warblers();
+    setup_i2c();
     setup_i2s();
 
     printf("Hello, World!\n");
 
-    uint32_t next = 500;
-    uint32_t next_adc = 1000;
-    while (true) {
+    // uint32_t next_blink = 500;
+    // uint32_t next_adc = 1000;
+    uint32_t next_i2c = 900;
 
-        // Red LED blinks.
+    while (true) {
         uint32_t now = system_millis;
-        if (now == next) {
-            gpio_toggle(GPIOB, GPIO0);
-            next += 500;
-        }
+
+        // // Red LED blinks.
+        // if (now >= next_blink) {
+        //     gpio_toggle(GPIOB, GPIO0);
+        //     next_blink += 50;
+        // }
 
         // On-board LED lights when trigger button pressed.
         if (debounce_update(&trigger_button)) {
@@ -184,10 +210,28 @@ int main(void)
             }
         }
 
-        // Slew knob value prints.
-        if (now == next_adc) {
-            printf("ADC = %d\n", adc_read_single(&slew_knob));
-            next_adc += 200;
+        // // Slew knob value prints.
+        // if (now >= next_adc) {
+        //     printf("ADC = %d\n", adc_read_single(&slew_knob));
+        //     next_adc += 1000;
+        // }
+
+        // Send i2c message.
+        static /*const*/ i2c_channel sgtl = {
+            .i_base_address = I2C1,
+            .i_is_master = true,
+            .i_stop = true,
+            .i_address = 0b00010100,
+        };
+        if (now >= next_i2c) {
+            gpio_set(GPIOB, GPIO0);
+            // sgtl.i_address ^= 0b01000000;
+            i2c_transmit(&sgtl, (const uint8_t *)"\0\0", 2);
+            while (system_millis < now + 3)
+                continue;
+            gpio_clear(GPIOB, GPIO0);
+            // printf("That was addr %u %#x\n", sgtl.i_address, sgtl.i_address);
+            next_i2c += 1000;
         }
     }
 
