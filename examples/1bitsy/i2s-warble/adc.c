@@ -1,9 +1,12 @@
 #include "adc.h"
 
 #include <libopencm3/stm32/adc.h>
+#include <libopencm3/stm32/rcc.h>
 
 void init_adc_channel(const adc_channel *adc)
 {
+    rcc_periph_clock_enable(RCC_ADC1);
+
     gpio_init_pin(&adc->adc_gpio);
 
     adc_power_off(adc->adc_adc);

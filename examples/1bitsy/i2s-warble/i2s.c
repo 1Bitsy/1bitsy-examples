@@ -18,6 +18,9 @@ extern void init_i2s(const i2s_config *cfg, const i2s_instance *inst)
     assert(cfg->i2sc_clock_source     == I2SC_PLL);
     assert(cfg->i2sc_full_duplex      == false);
     
+    // Enable I2S clock.
+    RCC_CR |= RCC_CR_PLLI2SON;
+
     SPI_I2SCFGR(base) = 0;
     
     uint32_t i2sdiv = 2;
