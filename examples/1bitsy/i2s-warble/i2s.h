@@ -6,6 +6,8 @@
 
 #include <libopencm3/stm32/spi.h>
 
+#include "gpio.h"
+
 typedef enum i2s_mode {
     I2SM_SLAVE_TX    = SPI_I2SCFGR_I2SCFG_SLAVE_TRANSMIT,
     I2SM_SLAVE_RX    = SPI_I2SCFGR_I2SCFG_SLAVE_RECEIVE,
@@ -31,6 +33,11 @@ typedef enum i2s_data_format {
                      | SPI_I2SCFGR_CHLEN,
 } __attribute__((__packed__)) i2s_data_format;
 
+typedef enum i2s_mclk_mode {
+    I2SM_DISABLED    = 0,
+    I2SM_ENABLED     = SPI_I2SPR_MCKOE,
+} i2s_mclk_mode;
+
 typedef enum i2s_clock_polarity {
     I2SC_CPOL_LOW    = 0,
     I2SC_CPOL_HIGH   = SPI_I2SCFGR_CKPOL,
@@ -46,10 +53,11 @@ typedef struct i2s_config {
     i2s_mode           i2sc_mode;
     i2s_standard       i2sc_standard;
     i2s_data_format    i2sc_data_format;
-    bool               i2sc_mclk_output;
+    i2s_mclk_mode      i2sc_mclk_output;
     i2s_clock_polarity i2sc_cpol;
     i2s_clock_source   i2sc_clock_source;
     bool               i2sc_full_duplex;
+    gpio_pin           i2sc_gpio_pins[5];
 } __attribute__((__packed__)) i2s_config;
 
 typedef struct i2s_instance {
@@ -57,6 +65,5 @@ typedef struct i2s_instance {
 } __attribute__((__packed__)) i2s_instance;
 
 extern void init_i2s(const i2s_config *, const i2s_instance *);
-extern void reset_i2s(const i2s_instance *);
 
 #endif /* !I2S_included */
