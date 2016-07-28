@@ -68,10 +68,52 @@ static void setup_i2s(void)
         .i2sc_mode             = I2SM_MASTER_TX,
         .i2sc_standard         = I2SS_LSB,
         .i2sc_data_format      = I2SF_16,
-        .i2sc_mclk_output      = false,
+        .i2sc_mclk_output      = I2SM_ENABLED,
         .i2sc_cpol             = I2SC_CPOL_HIGH,
         .i2sc_clock_source     = I2SC_PLL,
         .i2sc_full_duplex      = false,
+        .i2sc_gpio_pins        = {
+            {                   // LRCLK: Pin 21, PB12, AF5, I2S2_WS
+                .gp_port       = GPIOB,
+                .gp_pin        = GPIO12,
+                .gp_mode       = GPIO_MODE_AF,
+                .gp_pupd       = GPIO_PUPD_PULLUP,
+                .gp_af         = GPIO_AF5,
+                .gp_ospeed     = GPIO_OSPEED_2MHZ,
+                .gp_otype      = GPIO_OTYPE_PP,
+                .gp_level      = 0,
+            },
+            {                   // BCLK: Pin 22, PB3, AF5, I2S2_CK
+                .gp_port       = GPIOB,
+                .gp_pin        = GPIO3,
+                .gp_mode       = GPIO_MODE_AF,
+                .gp_pupd       = GPIO_PUPD_PULLUP,
+                .gp_af         = GPIO_AF5,
+                .gp_ospeed     = GPIO_OSPEED_2MHZ,
+                .gp_otype      = GPIO_OTYPE_PP,
+                .gp_level      = 0,
+            },
+            {                   // TX: Pin 24, PB15, AF5, I2S2_SD
+                .gp_port       = GPIOB,
+                .gp_pin        = GPIO15,
+                .gp_mode       = GPIO_MODE_AF,
+                .gp_pupd       = GPIO_PUPD_PULLUP,
+                .gp_af         = GPIO_AF5,
+                .gp_ospeed     = GPIO_OSPEED_2MHZ,
+                .gp_otype      = GPIO_OTYPE_PP,
+                .gp_level      = 0,
+            },
+            {                   // MCLK: Pin 25, PC6, AF5, I2S2_MCLK
+                .gp_port       = GPIOC,
+                .gp_pin        = GPIO6,
+                .gp_mode       = GPIO_MODE_AF,
+                .gp_pupd       = GPIO_PUPD_PULLUP,
+                .gp_af         = GPIO_AF5,
+                .gp_ospeed     = GPIO_OSPEED_25MHZ,
+                .gp_otype      = GPIO_OTYPE_PP,
+                .gp_level      = 0,
+            },
+        },
     };
     static const i2s_instance inst = {
         .i2si_base_address     = SPI2_BASE,
@@ -180,8 +222,8 @@ int main(void)
     setup_button();
     setup_knobs();
     setup_warblers();
-    setup_i2c();
     setup_i2s();
+    setup_i2c();
 
     printf("Hello, World!\n");
 
