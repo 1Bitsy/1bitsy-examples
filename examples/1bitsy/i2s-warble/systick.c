@@ -31,3 +31,9 @@ void register_systick_handler(systick_handler *handler)
     current_handler = handler;
 }
 
+void delay_msec(uint32_t msec)
+{
+    uint32_t t0 = system_millis;
+    while ((system_millis - t0) < msec)
+        continue;
+}

@@ -64,6 +64,15 @@ typedef struct i2s_instance {
     uint32_t           i2si_base_address;
 } __attribute__((__packed__)) i2s_instance;
 
-extern void init_i2s(const i2s_config *, const i2s_instance *);
+typedef enum i2s_channel {
+    I2SC_LEFT,
+    I2SC_RIGHT,
+} i2s_channel;
+
+typedef int16_t i2s_sample_callback(i2s_channel);
+
+extern void init_i2s(const i2s_config *,
+                     const i2s_instance *,
+                     i2s_sample_callback *);
 
 #endif /* !I2S_included */
