@@ -3,7 +3,7 @@
 #include <math.h>
 
 #define Fs     44100.0          // sample rate: Hz
-#define IVL        0.5          // sec
+#define IVL        0.25         // sec
 #define NCYCLE    20            // cycles
 
 const uint32_t UP_SAMPLES = (uint32_t)(Fs * IVL + 0.5);
@@ -40,6 +40,7 @@ void warbler_trigger(warbler *wp, warbler_state s, float slew)
         break;
 
     case WS_RISING:
+        wp->w_phase   = 0;
         wp->w_dphase  = wp->w_f0 / Fs;
         wp->w_ddphase = powf(wp->w_f1 / wp->w_f0, 1 / (slew * Fs));
         wp->w_samp_no = 0;
@@ -47,6 +48,7 @@ void warbler_trigger(warbler *wp, warbler_state s, float slew)
         break;
 
     case WS_FALLING:
+        wp->w_phase   = 0;
         wp->w_dphase  = wp->w_f1 / Fs;
         wp->w_ddphase = powf(wp->w_f0 / wp->w_f1, 1 / (slew * Fs));
         wp->w_samp_no = 0;
@@ -64,7 +66,10 @@ int16_t warbler_next_sample(warbler *wp, float slew)
     switch (wp->w_state) {
 
     case WS_IDLE:
-        samp = 0;
+        samp          = 0;
+        wp->w_phase   = 0.0;
+        wp->w_dphase  = 0.0;
+        wp->w_ddphase = 1.0;
         break;
 
     case WS_RISING:

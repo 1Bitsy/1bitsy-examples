@@ -17,6 +17,7 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include <libopencm3/stm32/adc.h>
@@ -29,6 +30,7 @@
 #include "gpio.h"
 #include "i2c.h"
 #include "i2s.h"
+#include "sgtl5000.h"
 #include "systick.h"
 #include "warbler.h"
 
@@ -36,6 +38,10 @@ static const float F0 = 220.0;
 static const float F1 = 1.2 * 220.0;
 
 static warbler w1, w2;
+static volatile bool w1_empty;
+static volatile int16_t w1_sample;
+static volatile bool w2_empty;
+static volatile int16_t w2_sample;
 
 static debounce trigger_button;
 
@@ -55,6 +61,29 @@ static const adc_channel slew_knob = { // PC0, ADC1 channel 10
         .gp_level  = 0,
     },
 };
+
+static int16_t next_sample(i2s_channel left_right)
+{
+    int16_t samp;
+
+    switch (left_right) {
+
+    case I2SC_LEFT:
+        samp = w1_sample;
+        w1_empty = true;
+        break;
+
+    case I2SC_RIGHT:
+        samp = w2_sample;
+        w2_empty = true;
+        break;
+
+    default:
+        assert(false && "i2s callback: unknown I2S channel");
+    }
+
+    return samp;
+}
 
 static void setup_clocks(void)
 {
@@ -83,9 +112,9 @@ static void setup_i2s(void)
                 .gp_otype      = GPIO_OTYPE_PP,
                 .gp_level      = 0,
             },
-            {                   // BCLK: Pin 22, PB3, AF5, I2S2_CK
+            {                   // BCLK: Pin 22, PB13, AF5, I2S2_CK
                 .gp_port       = GPIOB,
-                .gp_pin        = GPIO3,
+                .gp_pin        = GPIO13,
                 .gp_mode       = GPIO_MODE_AF,
                 .gp_pupd       = GPIO_PUPD_PULLUP,
                 .gp_af         = GPIO_AF5,
@@ -119,7 +148,7 @@ static void setup_i2s(void)
         .i2si_base_address     = SPI2_BASE,
     };
 
-    init_i2s(&cfg, &inst);
+    init_i2s(&cfg, &inst, next_sample);
 }
 
 static void setup_LEDs(void)
@@ -212,6 +241,18 @@ static void setup_i2c(void)
     init_i2c(&sgtl_i2c);
 }
 
+static void setup_sgtl5000(void)
+{
+    static const i2c_channel sgtl = {
+        .i_base_address = I2C1,
+        .i_is_master = true,
+        .i_stop = true,
+        .i_address = 0b00010100,
+    };
+    init_sgtl5000(&sgtl);
+    sgtl_set_volume(&sgtl, -6.0, -6.0);
+}
+
 int main(void)
 {
     setup_clocks();
@@ -222,58 +263,43 @@ int main(void)
     setup_button();
     setup_knobs();
     setup_warblers();
-    setup_i2s();
     setup_i2c();
+    setup_i2s();
+    setup_sgtl5000();
 
     printf("Hello, World!\n");
 
-    // uint32_t next_blink = 500;
-    // uint32_t next_adc = 1000;
-    uint32_t next_i2c = 900;
-
+    float slew = 0;
+    uint32_t next_adc_time = 0;
     while (true) {
         uint32_t now = system_millis;
+        if ((int32_t)(now - next_adc_time) >= 0) {
+            slew = adc_read_single(&slew_knob) / 4095.0;
+            next_adc_time += 10;
+        }
 
-        // // Red LED blinks.
-        // if (now >= next_blink) {
-        //     gpio_toggle(GPIOB, GPIO0);
-        //     next_blink += 50;
-        // }
+        if (w1_empty) {
+            w1_sample = warbler_next_sample(&w1, slew);
+            w1_empty = false;
+        }
+        if (w2_empty) {
+            w2_sample = warbler_next_sample(&w2, slew);
+            w2_empty = false;
+            if (!warbler_is_active(&w2))
+                gpio_set(GPIOA, GPIO8);
+        }
 
-        // On-board LED lights when trigger button pressed.
         if (debounce_update(&trigger_button)) {
             if (debounce_is_falling_edge(&trigger_button)) {
                 gpio_clear(GPIOA, GPIO8);
                 printf("Click-"); fflush(stdout);
+                warbler_trigger(&w1, WS_RISING, slew);
+                warbler_trigger(&w2, WS_FALLING, slew);
             }
             if (debounce_is_rising_edge(&trigger_button)) {
-                gpio_set(GPIOA, GPIO8);
+                // gpio_set(GPIOA, GPIO8);
                 printf("clack\n");
             }
-        }
-
-        // // Slew knob value prints.
-        // if (now >= next_adc) {
-        //     printf("ADC = %d\n", adc_read_single(&slew_knob));
-        //     next_adc += 1000;
-        // }
-
-        // Send i2c message.
-        static /*const*/ i2c_channel sgtl = {
-            .i_base_address = I2C1,
-            .i_is_master = true,
-            .i_stop = true,
-            .i_address = 0b00010100,
-        };
-        if (now >= next_i2c) {
-            gpio_set(GPIOB, GPIO0);
-            // sgtl.i_address ^= 0b01000000;
-            i2c_transmit(&sgtl, (const uint8_t *)"\0\0", 2);
-            while (system_millis < now + 3)
-                continue;
-            gpio_clear(GPIOB, GPIO0);
-            // printf("That was addr %u %#x\n", sgtl.i_address, sgtl.i_address);
-            next_i2c += 1000;
         }
     }
 
