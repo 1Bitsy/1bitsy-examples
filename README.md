@@ -6,6 +6,12 @@ This repository contains assorted example projects for the 1BitSy development pl
 
 ## Usage
 
+To be able to compile the examples included in this repository you will requiere
+an arm-none-eabi gcc toolchain. We recommend you install the gcc-arm-embedded
+toolchain that is being maintained by ARM. The downloads and installation
+instructions for Linux (Ubuntu), Mac OS X and Windows can be found on the
+[gcc-arm-embedded Launchpad page](https://launchpad.net/gcc-arm-embedded/).
+
 You _must_ run "make" in the top level directory first.  This builds the
 library and all examples.  If you're simply hacking on a single example after
 that, you can type "make clean; make" in any of the individual project
@@ -46,7 +52,7 @@ your setup. Here are a few examples.
 
 ### Black Magic Probe
 
-    cd examples/stm32/f1/stm32vl-discovery/miniblink
+    cd examples/1bitsy/fancyblink
     arm-none-eabi-gdb miniblink.elf
     target extended_remote /dev/ttyACM0
     monitor swdp_scan
@@ -68,7 +74,7 @@ following to the .gdbinit to make the flashing and debugging easier:
 
 Having this in your .gdbinit boils down the flashing/debugging process to:
 
-    cd examples/stm32/f1/stm32vl-discovery/miniblink
+    cd examples/1bitsy/fancyblink
     arm-none-eabi-gdb miniblink.elf
     load
     run
@@ -76,7 +82,15 @@ Having this in your .gdbinit boils down the flashing/debugging process to:
 
 ### DFU-Util
 
-TODO
+If you put your 1Bitsy in the DFU Bootloader mode (having the DFU Bootloader
+jumper shorted while you plug in the USB cable for example) you will be able to
+use the following command to upload your firmware:
+
+    cd examples/1bitsy/fancyblink
+    make fancyblink.bin
+    dfu-util -d 0483:df11 -c 1 -a 0 -s 0x08000000:leave -D fancyblink.bin
+
+For this to work you will need dfu-util V0.8 or newer!
 
 ## Reuse
 
