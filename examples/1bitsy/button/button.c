@@ -42,11 +42,11 @@ static void gpio_setup(void)
 
 static void button_setup(void)
 {
-	/* Enable GPIOA clock. */
-	rcc_periph_clock_enable(RCC_GPIOD);
+	/* Enable GPIOC clock. */
+	rcc_periph_clock_enable(RCC_GPIOC);
 
-	/* Set GPIO2 (in GPIO port D) to 'input open-drain'. */
-	gpio_mode_setup(GPIOD, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO2);
+	/* Set GPIO1 (in GPIO port C) to 'input open-drain'. */
+	gpio_mode_setup(GPIOC, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO1);
 }
 
 int main(void)
@@ -62,14 +62,14 @@ int main(void)
 		gpio_toggle(GPIOA, GPIO8);
 
 		/* Upon button press, blink more slowly. */
-		exti_line_state = GPIOD_IDR;
-		if ((exti_line_state & (1 << 2)) != 0) {
+		exti_line_state = GPIOC_IDR;
+		if ((exti_line_state & (1 << 1)) != 0) {
 			for (i = 0; i < 3000000; i++) {	/* Wait a bit. */
 				__asm__("nop");
 			}
 		}
 
-		for (i = 0; i < 3000000; i++) {		/* Wait a bit. */
+		for (i = 0; i < 2000000; i++) {		/* Wait a bit. */
 			__asm__("nop");
 		}
 	}
