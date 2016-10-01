@@ -17,6 +17,8 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
+OBJS = ../common/button_boot.o
+
 BINARY = tick_blink
 
 LDSCRIPT = ../stm32f4-1bitsy.ld

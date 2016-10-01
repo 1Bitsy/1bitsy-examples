@@ -17,6 +17,9 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with this library. If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include "../common/button_boot.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
@@ -143,6 +146,8 @@ static void tim1_setup(void)
 
 int main(void)
 {
+    button_boot();
+
     clock_setup();
     gpiob6_setup();
     tim4_setup();

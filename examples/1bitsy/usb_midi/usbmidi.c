@@ -17,6 +17,8 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../common/button_boot.h"
+
 #include <stdlib.h>
 #include <libopencm3/usb/usbd.h>
 #include <libopencm3/usb/audio.h>
@@ -369,6 +371,8 @@ static void button_poll(usbd_device *usbd_dev)
 int main(void)
 {
 	usbd_device *usbd_dev;
+
+	button_boot();
 
 	rcc_clock_setup_hse_3v3(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
 

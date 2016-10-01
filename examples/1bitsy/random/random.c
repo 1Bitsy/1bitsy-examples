@@ -18,6 +18,8 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../common/button_boot.h"
+
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
@@ -75,6 +77,9 @@ static uint32_t random_int(void)
 int main(void)
 {
 	int i, j;
+
+	button_boot();
+
 	rcc_setup();
 	gpio_setup();
 	rng_setup();

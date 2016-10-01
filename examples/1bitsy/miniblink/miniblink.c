@@ -18,6 +18,8 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../common/button_boot.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
@@ -45,6 +47,8 @@ static void gpio_setup(void)
 int main(void)
 {
 	int i;
+
+	button_boot();
 
 	gpio_setup();
 
