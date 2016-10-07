@@ -72,6 +72,7 @@ static void run()
 
     int left = 50, top = 50;
     int width = 240 - 100, height = 320/2 - 100;
+    int xinc = +1, yinc = +1;
 
     for (int ci = 0; ; ci = (ci + 1) % color_count) {
         uint16_t color = colors[ci];
@@ -81,6 +82,16 @@ static void run()
         my_ILI.writeRect(0, 0, 240, 320/2, buf[0]);
         my_ILI.writeRect(0, 320/2, 240, 320/2, buf[0]);
         // delay_msec(20);
+        left += xinc;
+        top += yinc;
+        if (left + width >= 240)
+            xinc = -1;
+        if (left == 0)
+            xinc = +1;
+        if (top + height >= 320/2)
+            yinc = -2;
+        if (top <= 1)
+            yinc = +1;
     }
 }
 
