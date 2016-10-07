@@ -17,9 +17,11 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-BINARY = tft1
+BINARY   := tft1
+SOURCES  := ILI9341.cpp glcdfont.c systick.c
+OBJS     := $(patsubst %.cpp, %.o, $(SOURCES:%.c=%.o))
 
-LDSCRIPT = ../stm32f4-1bitsy.ld
+LDSCRIPT := ../stm32f4-1bitsy.ld
 
 include ../Makefile.include
-
+CXXFLAGS += -O0 -Wno-effc++ -Wno-missing-field-initializers
