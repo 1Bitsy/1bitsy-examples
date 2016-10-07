@@ -59,16 +59,21 @@ static uint16_t colors[] = {
 };
 static size_t color_count = (&colors)[1] - colors;
 
+static uint16_t buf[320/2][240];
+
+static void fill_rect(int x0, int y0, int x1, int y1, uint16_t color)
+{
+    for (int y = y0; y < y1; y++)
+        for (int x = x0; x < x1; x++)
+            buf[y][x] = color;
+}
+
 static void run()
 {
     my_ILI.fillScreen(ILI9341_NAVY);
     my_ILI.fillRect(50, 50, 150, 100, ILI9341_YELLOW);
 
-    static uint16_t buf[320/2][240];
-
-    for (int y = 0; y < 320/2; y++)
-        for (int x = 0; x < 240; x++)
-            buf[y][x] = ILI9341_BLACK;
+    fill_rect(0, 0, 240, 320/2, ILI9341_BLACK);
 
     int left = 50, top = 50;
     int width = 240 - 100, height = 320/2 - 100;
@@ -76,12 +81,18 @@ static void run()
 
     for (int ci = 0; ; ci = (ci + 1) % color_count) {
         uint16_t color = colors[ci];
-        for (int y = top; y < top + height; y++)
-            for (int x = left; x < left + width; x++)
-                buf[y][x] = color;
+        fill_rect(left, top, left + width, top + height, color);
         my_ILI.writeRect(0, 0, 240, 320/2, buf[0]);
         my_ILI.writeRect(0, 320/2, 240, 320/2, buf[0]);
+
+        // erase edges
+        fill_rect(left, top, left + 1, top + height, ILI9341_BLACK);
+        fill_rect(left + width - 1, top, left + width, top + height, ILI9341_BLACK);
+        fill_rect(left, top, left + width, top + 1, ILI9341_BLACK);
+        fill_rect(left, top + height - 2, left + width, top + height, ILI9341_BLACK);
+        
         // delay_msec(20);
+
         left += xinc;
         top += yinc;
         if (left + width >= 240)
