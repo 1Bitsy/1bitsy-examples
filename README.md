@@ -54,7 +54,7 @@ your setup. Here are a few examples.
 
     cd examples/1bitsy/fancyblink
     arm-none-eabi-gdb miniblink.elf
-    target extended_remote /dev/ttyACM0
+    target extended-remote /dev/ttyACM0
     monitor swdp_scan
     attach 1
     load
