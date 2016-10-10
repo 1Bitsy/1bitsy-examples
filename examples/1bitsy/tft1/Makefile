@@ -24,4 +24,4 @@ OBJS     := $(patsubst %.cpp, %.o, $(SOURCES:%.c=%.o))
 LDSCRIPT := ../stm32f4-1bitsy.ld
 
 include ../Makefile.include
-CXXFLAGS += -O0 -Wno-effc++ -Wno-missing-field-initializers
+CXXFLAGS += -O3 -Wno-effc++ -Wno-missing-field-initializers
