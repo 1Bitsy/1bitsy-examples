@@ -218,13 +218,13 @@ uint8_t ILI9341_t3::readdata(void)
        // First wait until output queue is empty
         uint16_t wTimeout = 0xffff;
         while (((KINETISK_SPI0.SR) & (15 << 12)) && (--wTimeout)) ; // wait until empty
-        
+
 //       	KINETISK_SPI0.MCR |= SPI_MCR_CLR_RXF; // discard any received data
 //		KINETISK_SPI0.SR = SPI_SR_TCF;
-        
+
         // Transfer a 0 out... 
         writedata8_cont(0);   
-        
+
         // Now wait until completed. 
         wTimeout = 0xffff;
         while (((KINETISK_SPI0.SR) & (15 << 12)) && (--wTimeout)) ; // wait until empty
@@ -505,7 +505,7 @@ void ILI9341_t3::begin(void)
                         GPIO_MODE_OUTPUT,
                         GPIO_PUPD_NONE,
                         LCD_DATA_PINS);
-        
+
 #endif
 	// toggle RST low to reset
 #if 0

@@ -90,7 +90,7 @@ static void run()
         fill_rect(left + width - 1, top, left + width, top + height, ILI9341_BLACK);
         fill_rect(left, top, left + width, top + 1, ILI9341_BLACK);
         fill_rect(left, top + height - 2, left + width, top + height, ILI9341_BLACK);
-        
+
         // delay_msec(20);
 
         left += xinc;
