@@ -106,12 +106,12 @@ static void gpio_setup(void)
 
 static void usart_send_to_all_blocking(char c)
 {
-	usart_send(USART1, c);
-	usart_send(USART2, c);
-	usart_send(USART3, c);
-	usart_send(UART4, c);
-	usart_send(UART5, c);
-	usart_send(USART6, c);
+	usart_send_blocking(USART1, c);
+	usart_send_blocking(USART2, c);
+	usart_send_blocking(USART3, c);
+	usart_send_blocking(UART4, c);
+	usart_send_blocking(UART5, c);
+	usart_send_blocking(USART6, c);
 }
 
 int main(void)
