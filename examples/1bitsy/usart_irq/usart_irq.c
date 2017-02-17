@@ -150,7 +150,7 @@ static void usart_handler(int usart_id)
 	    ((USART_SR(usart) & USART_SR_RXNE) != 0)) {
 
 		/* Indicate that we got data. */
-		gpio_toggle(GPIOD, GPIO12);
+		gpio_toggle(GPIOA, GPIO8);
 
 		/* Retrieve the data from the peripheral. */
 		data[usart_id] = usart_recv(usart);
