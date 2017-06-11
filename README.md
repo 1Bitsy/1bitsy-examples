@@ -44,7 +44,7 @@ you don't have to choose by invoking:
 You can also use the dfu-util to upload the selected firmware by running:
     
     cd examples/1bitsy/miniblink
-    make flash-dfu
+    make dfu-flash
 
 ## Flashing Manually
 You can also flash manually. Using a miriad of different tools depending on
