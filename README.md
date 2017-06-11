@@ -42,7 +42,7 @@ you don't have to choose by invoking:
     make flash BMP_PORT=/dev/ttyACM0
 
 You can also use the dfu-util to upload the selected firmware by running:
-    
+
     cd examples/1bitsy/miniblink
     make flash-dfu
 
@@ -88,7 +88,7 @@ use the following command to upload your firmware:
 
     cd examples/1bitsy/fancyblink
     make fancyblink.bin
-    dfu-util -d 0483:df11 -c 1 -a 0 -s 0x08000000:leave -D fancyblink.bin
+    sudo dfu-util -d 0483:df11 -c 1 -a 0 -s 0x08000000:leave -D fancyblink.bin
 
 For this to work you will need dfu-util V0.8 or newer!
 
@@ -105,50 +105,52 @@ examples repository shows the general way. There is also a
 2. Add libopencm3 as a submodule
 
        git submodule add https://github.com/libopencm3/libopencm3
-    
 
 3. Grab a copy of the basic rules
+
 These urls grab the latest from the libopencm3-examples repository
 
        wget \
-         https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/Makefile.rules \
+         https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/rules.mk \
          -O libopencm3.rules.mk
 
-4. Grab a copy of your target Makefile in this case, for STM32L1
+4. Grab a copy of your target Makefile in this case, for STM32F4
 
-       wget \  
-         https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/stm32/l1/Makefile.include \  
+       wget \
+         https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/stm32/f4/Makefile.include \
          -O libopencm3.target.mk
 
-5. Edit paths in `libopencm3.target.mk`  
+5. Edit paths in `libopencm3.target.mk`
+
 Edit the _last_ line of `libopencm3.target.mk` and change the include to read
 include `../libopencm3.rules.mk` (the amount of .. depends on where you put your
-project in the next step..
+project in the next step).
 
-6. beg/borrow/steal an example project
-For sanity's sake, use the same target as the makefile you grabbed up above)
+6. Beg/borrow/steal an example project
+
+For sanity's sake, use the same target as the makefile you grabbed up above.
 
        cp -a \
-         somewhere/libopencm3-examples/examples/stm32/l1/stm32ldiscovery/miniblink \
+         somewhere/libopencm3-examples/examples/stm32/f4/stm32f4-discovery/miniblink \
          myproject
 
-Add the path to OPENCM3\_DIR, and modify the path to makefile include
-
+Add the path to `OPENCM3_DIR , set the right `DEVICE` and modify the path to
+makefile include:
 
     diff -u
-    ---
-    2014-01-24 21:10:52.687477831 +0000
-    +++ Makefile    2014-03-23 12:27:57.696088076 +0000
+    --- Makefile.orig       2017-06-11 12:42:25.378248089 +0200
+    +++ Makefile    2017-06-11 12:46:42.566244271 +0200
     @@ -19,7 +19,8 @@
      
      BINARY = miniblink
      
-    +OPENCM3_DIR=../libopencm3
-     LDSCRIPT = $(OPENCM3_DIR)/lib/stm32/l1/stm32l15xxb.ld
+    -DEVICE=STM32F407VG
+    +OPENCM3_DIR = ../libopencm3
+    +DEVICE = STM32F415RGT6
      
     -include ../../Makefile.include
     +include ../libopencm3.target.mk
- 
+
 You're done :)
 
 You need to run "make" inside the libopencm3 directory once to build the
