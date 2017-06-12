@@ -147,21 +147,26 @@ int main(void)
 	gpio_setup();
 	tim_setup();
 
-#if 1
 	j0 = 0;
 	d0 = 1;
 	while (1) {
-		timer_set_oc_value(TIM1, TIM_OC1, gamma_table[j0]);
+		/* Set the timer compare value to the on time based on the gamma table.
+		 * Using the inverse of the gamma table, because the LED on the 1Bitsy
+		 * is on when the PWM signal is low.
+		 */
+		timer_set_oc_value(TIM1, TIM_OC1, 65535-gamma_table[j0]);
+
+		/* Progress through the gamma table index up and down. */
 		j0 += d0;
 		if (j0 == 255)
 			d0 = -1;
 		if (j0 == 0)
 			d0 = 1;
+
+		/* Wait a little bit. */
 		for (i = 0; i < 200000; i++) asm("nop");
 
-		//asm("nop");
 	}
-#endif
 
 	return 0;
 }
