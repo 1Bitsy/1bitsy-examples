@@ -1,0 +1,16 @@
+mon ver
+mon tpwr en
+# Optional: Enable system Reset on connect
+#mon connect_srst enable
+# Alternative: Use JTAG protocol to talk to the target
+#mon jtag
+# Scan for targets using SWD protocol
+mon swdp
+# Attach to the first device found
+att 1
+# Erase and load the provided binary to flash
+load
+# Compare the loaded sections to the ones in the provided binary
+compare-sections
+# Reset and disconnect from the target
+kill
