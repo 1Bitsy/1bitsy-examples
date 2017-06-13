@@ -1,6 +1,6 @@
 # README
 
-[![Gitter channel](https://badges.gitter.im/libopencm3/discuss.svg)](https://gitter.im/1bitsy/discuss)
+[![Gitter channel](https://badges.gitter.im/libopencm3/discuss.svg)](https://gitter.im/1bitsy/Lobby)
 
 This repository contains assorted example projects for the 1BitSy development platform.
 
@@ -25,8 +25,8 @@ only minimal changes for the libopencm3 install path (See Reuse)
 
 ## Make Flash Target
 For flashing the 'miniblink' example (after you built libopencm3 and the
-examples by typing 'make' at the top-level directory) onto the Olimex
-STM32-H103 eval board (ST STM32F1 series microcontroller), you can execute:
+examples by typing 'make' at the top-level directory) onto the 1bitsy, you can
+execute:
 
     cd examples/1bitsy/miniblink
     make flash
