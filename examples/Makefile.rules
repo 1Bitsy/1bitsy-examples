@@ -229,20 +229,22 @@ else
 endif
 
 ifeq ($(BMP_PORT),)
-%.flash: %.elf
-	@printf "  GDB   $(*).elf (flash)\n"
-	$(Q)$(GDB) --batch \
-		   -ex 'target extended-remote /dev/ttyACM0' \
-		   -x $(SCRIPT_DIR)/black_magic_probe_flash.scr \
-		   $(*).elf
+BMP_PORT_CANDIDATES := $(wildcard \
+/dev/serial/by-id/usb-Black_Sphere_Technologies_Black_Magic_Probe_*-if00 \
+/dev/cu.usbmodem*1)
+ifeq ($(words $(BMP_PORT_CANDIDATES)),1)
+BMP_PORT := $(BMP_PORT_CANDIDATES)
 else
+BMP_PORT = $(error Probe not found, please use BMP_PORT to choose port name$(if \
+$(BMP_PORT_CANDIDATES), (found $(BMP_PORT_CANDIDATES))))
+endif
+endif
 %.flash: %.elf
 	@printf "  GDB   $(*).elf (flash)\n"
 	$(Q)$(GDB) --batch \
 		   -ex 'target extended-remote $(BMP_PORT)' \
 		   -x $(SCRIPT_DIR)/black_magic_probe_flash.scr \
 		   $(*).elf
-endif
 
 .PHONY: images clean stylecheck styleclean elf bin hex srec list
 
