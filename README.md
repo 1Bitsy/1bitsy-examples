@@ -23,6 +23,16 @@ For insanity levels of verboseness, use "make V=99"
 The makefiles are generally useable for your own projects with
 only minimal changes for the libopencm3 install path (See Reuse)
 
+## Notes
+
+If you are using an older GCC compiler. (pre V5) You may need to provide the C
+standard to the compiler. Otherwise the compiler might complain. To solve the
+issue you can invoke the `make` command in the top level directory by setting
+the `CFLAGS` variable:
+```
+CFLAGS=-std=c99 make
+```
+
 ## Make Flash Target
 For flashing the 'miniblink' example (after you built libopencm3 and the
 examples by typing 'make' at the top-level directory) onto the 1bitsy, you can
