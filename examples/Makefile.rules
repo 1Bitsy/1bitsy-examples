@@ -240,8 +240,8 @@ $(BMP_PORT_CANDIDATES), (found $(BMP_PORT_CANDIDATES))))
 endif
 endif
 %.flash: %.elf
-	@printf "  GDB   $(*).elf (flash)\n"
-	$(Q)$(GDB) --batch \
+	@printf "  BMP $(BMP_PORT) $(*).elf (flash)\n"
+	$(Q)$(GDB) -nx --batch \
 		   -ex 'target extended-remote $(BMP_PORT)' \
 		   -x $(SCRIPT_DIR)/black_magic_probe_flash.scr \
 		   $(*).elf
