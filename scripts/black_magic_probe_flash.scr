@@ -1,13 +1,19 @@
-mon ver
-mon tpwr en
+# Disable asking for confirmation. (All questions are automatically answered
+# with y if ran in batch mode, but it still prints warnings that don't look
+# very good. :D )
+set confirm off
+# Print the Black Magic Probe firmware version
+monitor version
+# Optional: Enable target power
+#monitor tpwr enable
 # Optional: Enable system Reset on connect
-#mon connect_srst enable
+#monitor connect_srst enable
 # Alternative: Use JTAG protocol to talk to the target
-#mon jtag
+#monitor jtag_scan
 # Scan for targets using SWD protocol
-mon swdp
+monitor swdp_scan
 # Attach to the first device found
-att 1
+attach 1
 # Erase and load the provided binary to flash
 load
 # Compare the loaded sections to the ones in the provided binary
