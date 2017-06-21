@@ -34,23 +34,23 @@ static void clock_setup(void)
 
 static void gpiob6_setup(void)
 {
-    /* Enable GPIOD clock. */
+    /* Enable GPIOB clock. */
     rcc_periph_clock_enable(RCC_GPIOB);
-    /* Set GPIO12 (in GPIO port C) to 'output push-pull'. */
+    /* Set GPIO6 (in GPIO port B) to 'output push-pull'. */
     gpio_mode_setup(GPIOB, GPIO_MODE_AF,
                     GPIO_PUPD_NONE, GPIO6);
-    /* Set GPIO12 (in GPIO port C) alternate function */
+    /* Set GPIO6 (in GPIO port B) alternate function */
     gpio_set_af(GPIOB, GPIO_AF2, GPIO6);
 }
 
 static void gpioa8_setup(void)
 {
-    /* Enable GPIOD clock. */
+    /* Enable GPIOA clock. */
     rcc_periph_clock_enable(RCC_GPIOA);
-    /* Set GPIO12 (in GPIO port C) to 'output push-pull'. */
+    /* Set GPIO8 (in GPIO port A) to 'output push-pull'. */
     gpio_mode_setup(GPIOA, GPIO_MODE_AF,
                     GPIO_PUPD_NONE, GPIO8);
-    /* Set GPIO12 (in GPIO port C) alternate function */
+    /* Set GPIO8 (in GPIO port A) alternate function */
     gpio_set_af(GPIOA, GPIO_AF1, GPIO8);
 }
 
@@ -61,17 +61,19 @@ static void tim4_setup(void)
     /* Reset TIM4 peripheral. */
     timer_reset(TIM4);
     /* Timer global mode:
-    * - No divider
+    * - Sampling clock divider 1
     * - Alignment edge
     * - Direction up
     */
     timer_set_mode(TIM4, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    timer_set_prescaler(TIM4, 0);
+    /* Prescaler:
+     * divide the input clock (half of the core clock aka 84MHz) by 128) */
+    timer_set_prescaler(TIM4, 128);
     /* Enable preload. */
     timer_disable_preload(TIM4);
     /* Continous mode. */
     timer_continuous_mode(TIM4);
-    /* Period (36kHz). */
+    /* Period (10Hz). (84MHz/128/65535) */
     timer_set_period(TIM4, 0xFFFF);
     /* Disable outputs. */
     timer_disable_oc_output(TIM4, TIM_OC1);
@@ -85,7 +87,9 @@ static void tim4_setup(void)
     timer_set_oc_slow_mode(TIM4, TIM_OC1);
     timer_set_oc_mode(TIM4, TIM_OC1, TIM_OCM_PWM1);
     timer_set_oc_polarity_high(TIM4, TIM_OC1);
-    /* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
+    /* Set the capture compare value for OC1 to half of the period to achieve
+     * 50% duty cycle.
+     */
     timer_set_oc_value(TIM4, TIM_OC1, 0xFFFF/2);
     timer_enable_oc_output(TIM4, TIM_OC1);
     timer_enable_preload(TIM4);
@@ -100,18 +104,20 @@ static void tim1_setup(void)
     /* Reset TIM1 peripheral. */
     timer_reset(TIM1);
     /* Timer global mode:
-    * - No divider
+    * - Deadtime/sampling clock divider 1
     * - Alignment edge
     * - Direction up
     */
     timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-    timer_set_prescaler(TIM1, 0);
+    /* Prescaler:
+     * divide the input clock (full core clock aka 168MHz) by 128) */
+    timer_set_prescaler(TIM1, 128);
     timer_set_repetition_counter(TIM1, 0);
     /* Enable preload. */
     timer_disable_preload(TIM1);
     /* Continous mode. */
     timer_continuous_mode(TIM1);
-    /* Period (36kHz). */
+    /* Period (20Hz). (168MHz/128/65535) */
     timer_set_period(TIM1, 0xFFFF);
     /* Disable outputs. */
     timer_disable_oc_output(TIM1, TIM_OC1);
@@ -135,7 +141,9 @@ static void tim1_setup(void)
     timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
     timer_set_oc_polarity_high(TIM1, TIM_OC1);
     timer_set_oc_idle_state_set(TIM1, TIM_OC1);
-    /* Set the capture compare value for OC1 to max value -1 for max duty cycle/brightness. */
+    /* Set the capture compare value for OC1 to half of the period to achieve
+     * 50% duty cycle.
+     */
     timer_set_oc_value(TIM1, TIM_OC1, 0xFFFF/2);
     timer_enable_oc_output(TIM1, TIM_OC1);
     timer_enable_preload(TIM1);
