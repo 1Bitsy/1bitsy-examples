@@ -64,7 +64,8 @@ OPENCM3_DIR := $(firstword $(dir $(OPENCM3_DIR)))
 
 ifeq ($(strip $(OPENCM3_DIR)),)
 $(warning Cannot find libopencm3 library in the standard search paths.)
-$(error Please specify it through OPENCM3_DIR variable!)
+$(warning You probably need to initialize the submodule in the repository top level directory.)
+$(error Alternatively please specify it's location through OPENCM3_DIR variable!)
 endif
 endif
 
@@ -122,6 +123,8 @@ endif
 LDLIBS		+= -l$(LIBNAME)
 LDLIBS		+= -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
+LOCM_LIB    = $(OPENCM3_DIR)/lib/lib$(LIBNAME).a
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -145,8 +148,22 @@ oocd-flash: $(BINARY).oocd-flash
 
 $(LDSCRIPT):
     ifeq (,$(wildcard $(LDSCRIPT)))
-        $(error Unable to find specified linker script: $(LDSCRIPT))
+	$(error Unable to find specified linker script: $(LDSCRIPT))
     endif
+
+$(LOCM_LIB):
+	$(Q)if [ ! "`ls -A $(OPENCM3_DIR)`" ] ; then \
+		printf "######## ERROR ########\n"; \
+		printf "\tlibopencm3 is not initialized.\n"; \
+		printf "\tPlease run:\n"; \
+		printf "\t$$ git submodule init\n"; \
+		printf "\t$$ git submodule update\n"; \
+		printf "\tbefore running make.\n"; \
+		printf "######## ERROR ########\n"; \
+		exit 1; \
+		fi
+	@printf "Trying to build the library in hopes of building the $(LDSCRIPT)"
+	$(Q)$(MAKE) -C $(OPENCM3_DIR) lib TARGETS="stm32/f4"
 
 %.images: %.bin %.hex %.srec %.list %.map
 	@printf "*** $* images generated ***\n"
@@ -167,19 +184,19 @@ $(LDSCRIPT):
 	@printf "  OBJDUMP $(*).list\n"
 	$(Q)$(OBJDUMP) -S $(*).elf > $(*).list
 
-%.elf %.map: $(OBJS) $(LDSCRIPT)
+%.elf %.map: $(OBJS) $(LDSCRIPT) $(LOCM_LIB)
 	@printf "  LD      $(*).elf\n"
 	$(Q)$(LD) $(LDFLAGS) $(ARCH_FLAGS) $(OBJS) $(LDLIBS) -o $(*).elf
 
-%.o: %.c
+%.o: %.c $(LOCM_LIB)
 	@printf "  CC      $(*).c\n"
 	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).c
 
-%.o: %.cxx
+%.o: %.cxx $(LOCM_LIB)
 	@printf "  CXX     $(*).cxx\n"
 	$(Q)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).cxx
 
-%.o: %.cpp
+%.o: %.cpp $(LOCM_LIB)
 	@printf "  CXX     $(*).cpp\n"
 	$(Q)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(ARCH_FLAGS) -o $(*).o -c $(*).cpp
 
