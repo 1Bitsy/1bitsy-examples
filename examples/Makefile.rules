@@ -79,7 +79,10 @@ SCRIPT_DIR	= ../../../scripts
 ###############################################################################
 # C flags
 
-CFLAGS		+= -Os -g
+# Disabled Optimization as it does muddy the water when you try to step thourgh
+# the program in GDB
+#CFLAGS		+= -Os 
+CFLAGS		+= -g
 CFLAGS		+= -Wextra -Wshadow -Wimplicit-function-declaration
 CFLAGS		+= -Wredundant-decls -Wmissing-prototypes -Wstrict-prototypes
 CFLAGS		+= -fno-common -ffunction-sections -fdata-sections
@@ -87,7 +90,10 @@ CFLAGS		+= -fno-common -ffunction-sections -fdata-sections
 ###############################################################################
 # C++ flags
 
-CXXFLAGS	+= -O0 -g
+# Disabled Optimization as it does muddy the water when you try to step thourgh
+# the program in GDB
+#CXXFLAGS	+= -O0
+CXXFLAGS	+= -g
 CXXFLAGS	+= -Wextra -Wshadow -Wredundant-decls  -Weffc++
 CXXFLAGS	+= -fno-common -ffunction-sections -fdata-sections
 
