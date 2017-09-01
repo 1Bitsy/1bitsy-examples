@@ -21,5 +21,7 @@ BINARY = dac-dma
 
 LDSCRIPT = ../stm32f4-1bitsy.ld
 
+LDLIBS += -lm
+
 include ../Makefile.include
 

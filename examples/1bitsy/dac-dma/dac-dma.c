@@ -25,6 +25,8 @@
 #include <libopencm3/stm32/dac.h>
 #include <libopencm3/stm32/dma.h>
 
+#include <math.h>
+
 /* Timer 2 count period, 16 microseconds for a 72MHz APB2 clock */
 #define PERIOD 1152
 
@@ -70,7 +72,7 @@ static void timer_setup(void)
 	timer_disable_oc_preload(TIM2, TIM_OC1);
 	timer_set_oc_slow_mode(TIM2, TIM_OC1);
 	timer_set_oc_mode(TIM2, TIM_OC1, TIM_OCM_TOGGLE);
-	timer_set_oc_value(TIM2, TIM_OC1, 400);
+	timer_set_oc_value(TIM2, TIM_OC1, 500);
 	timer_disable_preload(TIM2);
 	/* Set the timer trigger output (for the DAC) to the channel 1 output
 	   compare */
@@ -132,6 +134,7 @@ void dma1_stream5_isr(void)
 /*--------------------------------------------------------------------*/
 int main(void)
 {
+#if 0
 	/* Fill the array with funky waveform data */
 	/* This is for dual channel 8-bit right aligned */
 	uint16_t i, x;
@@ -149,6 +152,14 @@ int main(void)
 		}
 		waveform[i] = x;
 	}
+#endif
+
+	/* Fill the array with sinus waveform data */
+	uint16_t i;
+	for (i = 0; i < 256; i++) {
+		waveform[i] = (((sinf(((M_PI * 2.0)*1) * (i / 256.0))) / 4) + 1.0) * (0xFF / 2);
+	}
+
 	clock_setup();
 	gpio_setup();
 	timer_setup();
