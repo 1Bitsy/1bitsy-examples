@@ -25,4 +25,3 @@ LDSCRIPT = ../stm32f4-1bitsy.ld
 
 include ../Makefile.include
 
-CFLAGS += -O0

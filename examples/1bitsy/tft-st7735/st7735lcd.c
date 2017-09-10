@@ -22,8 +22,6 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/spi.h>
 
-#define MY_CLOCK (rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ])
-
 // 1bitsy pins connected to TFT
 #define TFT_SCK GPIO10
 #define TFT_MOSI GPIO15
@@ -61,8 +59,8 @@
 
 static void systick_setup(void)
 {
-    rcc_clock_setup_hse_3v3(&MY_CLOCK);
-    setup_systick(MY_CLOCK.ahb_frequency);
+    rcc_clock_setup_hse_3v3(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
+    setup_systick(rcc_ahb_frequency);
 }
 
 static void gpio_setup(void)
@@ -192,7 +190,7 @@ static void tft_set_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 /*
  * Example graphics function to fill a rectangle with a single color
  */
-static void FillRect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+static void fill_rect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
 {
     // Compute number of pixels in rectange
     uint16_t width = x1-x0+1;
@@ -218,14 +216,14 @@ int main(void)
     tft_init();
 
     // Set entire screen to black
-    FillRect(0,0,XMAX,YMAX,BLACK);
+    fill_rect(0,0,XMAX,YMAX,BLACK);
 
     // Loop
     while (1) {
-        FillRect(20,20,XMAX-20,YMAX-20,BLUE);
+        fill_rect(20,20,XMAX-20,YMAX-20,BLUE);
         delay_msec(1000);
 
-        FillRect(20,20,XMAX-20,YMAX-20,GREEN);
+        fill_rect(20,20,XMAX-20,YMAX-20,GREEN);
         delay_msec(1000);
     }
 
