@@ -1,19 +1,13 @@
 
-
 01 min 10 secs sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
 
 01 min 30 secs sudo apt-get update
 
 01 min 38 secs sudo apt-get install gcc-arm-embedded
 
-
-
-
 01 min 51 secs sudo apt-get install git
 
 XX min XX secs sudo apt-get install make
-
-
 
 My version:
 
@@ -28,8 +22,6 @@ Official:
 
     02 min 07 secs cd 1bitsy-examples
 
-
-
 02 min 12 secs git submodule init
 
 02 min 15 secs git submodule update
@@ -43,9 +35,6 @@ Official:
 02 min 41 secs id
 
 02 min 48 secs <logout>
-
-
-
 
 04 min 54 secs <Plug in Black Magic Probe to microUSB>
 
