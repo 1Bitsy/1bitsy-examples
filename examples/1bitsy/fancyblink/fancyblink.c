@@ -68,8 +68,8 @@ int main(void)
 
 	/* Blink the LEDs (PA8) on the board. */
 	while (1) {
-            toggleLED_withDelay(6000000);
             toggleLED_withDelay(1000000);
+            toggleLED_withDelay(6000000);
 	}
 
 	return 0;
