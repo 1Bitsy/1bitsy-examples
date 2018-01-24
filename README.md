@@ -118,7 +118,7 @@ examples repository shows the general way. There is also a
 
 3. Grab a copy of the basic rules
 
-These URLs grab the latest from the libopencm3-examples repository
+    These URLs grab the latest from the libopencm3-examples repository
 
        wget \
          https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/rules.mk \
