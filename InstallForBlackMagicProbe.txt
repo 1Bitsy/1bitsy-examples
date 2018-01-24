@@ -115,20 +115,6 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 07 min 26 secs y
 
-DFU part:
 
-07 min 44 secs <Press the user button and insert microUSB cable>
 
-07 min 47 secs dmesg | tail
 
-07 min 50 secs lsusb
-
-07 min 54 secs <Output includes: "STMicroelectronics STM Device in DFU Mode">
-
-07 min 57 secs sudo apt-get install dfu-util
-
-08 min 13 secs make fancyblink.bin
-
-08 min 18 secs ls
-
-08 min 23 secs sudo dfu-util -d 0483:df11 -c 1 -a 0 -s 0x08000000:leav
