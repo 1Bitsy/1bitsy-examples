@@ -34,6 +34,7 @@ static void clock_setup(void)
 	rcc_periph_clock_enable(RCC_GPIOA);
 }
 
+
 static void gpio_setup(void)
 {
 	/* Set GPIO8 (in GPIO port A) to 'output push-pull'. */
@@ -41,9 +42,21 @@ static void gpio_setup(void)
 			GPIO_PUPD_NONE, GPIO8);
 }
 
-int main(void)
+
+static void toggleLED_withDelay(int aLoopCount)
 {
 	int i;
+
+	/* Toggle LEDs. */
+	gpio_toggle(GPIOA, GPIO8);
+	for (i = 0; i < aLoopCount; i++) { /* Wait a bit. */
+		__asm__("nop");
+	}
+}
+
+
+int main(void)
+{
 
 	button_boot();
 
@@ -55,11 +68,8 @@ int main(void)
 
 	/* Blink the LEDs (PA8) on the board. */
 	while (1) {
-		/* Toggle LEDs. */
-		gpio_toggle(GPIOA, GPIO8);
-		for (i = 0; i < 6000000; i++) { /* Wait a bit. */
-			__asm__("nop");
-		}
+            toggleLED_withDelay(1000000);
+            toggleLED_withDelay(6000000);
 	}
 
 	return 0;

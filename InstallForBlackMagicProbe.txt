@@ -1,0 +1,120 @@
+
+01 min 10 secs sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
+
+01 min 30 secs sudo apt-get update
+
+01 min 38 secs sudo apt-get install gcc-arm-embedded
+
+01 min 51 secs sudo apt-get install git
+
+XX min XX secs sudo apt-get install make
+
+My version:
+
+    cd ~
+    mkdir PeterMortensen_dev
+    cd PeterMortensen_dev
+    git clone https://github.com/PeterMortensen/1bitsy-examples.git
+    cd 1bitsy-examples
+
+Official:
+    02 min 02 secs git clone https://github.com/1bitsy/1bitsy-examples.git
+
+    02 min 07 secs cd 1bitsy-examples
+
+02 min 12 secs git submodule init
+
+02 min 15 secs git submodule update
+
+02 min 21 secs make
+
+02 min 28 secs id
+
+02 min 32 secs sudo adduser $USER dialout
+
+02 min 41 secs id
+
+02 min 48 secs <logout>
+
+04 min 54 secs <Plug in Black Magic Probe to microUSB>
+
+05 min 32 secs dmesg | tail
+
+05 min 34 secs <Output includes: "ttyACM0" and "ttyACM1">
+
+05 min 42 secs <Plug in 1bitsy to microUSB>
+
+05 min 43 secs dmesg | tail
+
+05 min 44 secs <Output includes: "ttyACM2" - but ONLY if there is already firmware on it that makes it appear as a serial device. This is NOT the case for the Kickstarter one...>
+
+05 min 45 secs <Connect 1bitsy and Black Magic Probe using the JTAG cable. Note: the ribbon cable is to come from the SAME DIRECTION as the USB cable. That is, the ribbon cable does NOT cover the main chip/IC.>
+
+
+My version:
+
+    cd ~/PeterMortensen_dev/1bitsy-examples/examples/1bitsy/fancyblink
+
+Official:
+    05 min 48 secs cd ~/1bitsy-examples/examples/1bitsy/fancyblink
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+05 min 49 secs arm-none-eabi-gdb fancyblink.elf
+
+05 min 54 secs target extended-remote /dev/ttyACM0
+
+06 min 04 secs monitor version
+
+06 min 11 secs monitor help
+
+06 min 17 secs monitor jtag_scan
+
+06 min 23 secs attach 1
+
+06 min 27 secs load
+
+06 min 30 secs run
+
+06 min 32 secs y
+
+06 min 37 secs <Ctrl + C>
+
+06 min 38 secs list
+
+06 min 43 secs tui enable
+
+06 min 47 secs cont
+
+06 min 51 secs <Ctrl + C>
+
+06 min 52 secs step
+
+06 min 53 secs start
+
+06 min 56 secs y
+
+07 min 00 secs next
+
+07 min 04 secs step
+
+07 min 07 secs next
+
+07 min 07 secs next
+
+07 min 17 secs next
+
+07 min 22 secs cont
+
+07 min 22 secs cont
+
+07 min 25 secs quit
+
+07 min 26 secs y
+
+07 min 26 secs y
+
+
+
+
