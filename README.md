@@ -110,59 +110,60 @@ examples repository shows the general way. There is also a
 
 1. Create an empty repository
 
-       mkdir mycoolrobot && cd mycoolrobot && git init .
+        mkdir mycoolrobot && cd mycoolrobot && git init .
 
 2. Add libopencm3 as a submodule
 
-       git submodule add https://github.com/libopencm3/libopencm3
+        git submodule add https://github.com/libopencm3/libopencm3
 
 3. Grab a copy of the basic rules
 
     These URLs grab the latest from the libopencm3-examples repository
 
-       wget \
+        wget \
          https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/rules.mk \
          -O libopencm3.rules.mk
 
 4. Grab a copy of your target Makefile in this case, for STM32F4
 
-       wget \
+        wget \
          https://raw.githubusercontent.com/libopencm3/libopencm3-examples/master/examples/stm32/f4/Makefile.include \
          -O libopencm3.target.mk
 
 5. Edit paths in `libopencm3.target.mk`
 
-Edit the _last_ line of `libopencm3.target.mk` and change the include to read
+    Edit the _last_ line of `libopencm3.target.mk` and change the include to read
 include `../libopencm3.rules.mk` (the amount of .. depends on where you put your
 project in the next step).
 
 6. Beg/borrow/steal an example project
 
-For sanity's sake, use the same target as the makefile you grabbed up above.
+    For sanity's sake, use the same target as the makefile you grabbed up above.
 
-       cp -a \
+        cp -a \
          somewhere/libopencm3-examples/examples/stm32/f4/stm32f4-discovery/miniblink \
          myproject
 
-Add the path to `OPENCM3_DIR , set the right `DEVICE` and modify the path to
+    Add the path to `OPENCM3_DIR , set the right `DEVICE` and modify the path to
 makefile include:
 
-    diff -u
-    --- Makefile.orig       2017-06-11 12:42:25.378248089 +0200
-    +++ Makefile    2017-06-11 12:46:42.566244271 +0200
-    @@ -19,7 +19,8 @@
-     
-     BINARY = miniblink
-     
-    -DEVICE=STM32F407VG
-    +OPENCM3_DIR = ../libopencm3
-    +DEVICE = STM32F415RGT6
-     
-    -include ../../Makefile.include
-    +include ../libopencm3.target.mk
+        diff -u
+        --- Makefile.orig       2017-06-11 12:42:25.378248089 +0200
+        +++ Makefile    2017-06-11 12:46:42.566244271 +0200
+        @@ -19,7 +19,8 @@
+
+         BINARY = miniblink
+
+        -DEVICE=STM32F407VG
+        +OPENCM3_DIR = ../libopencm3
+        +DEVICE = STM32F415RGT6
+
+        -include ../../Makefile.include
+        +include ../libopencm3.target.mk
 
 You're done :)
 
 You need to run "make" inside the libopencm3 directory once to build the
 library, and then you can just run make/make clean in your project directory as
 often as you like.
+
