@@ -59,7 +59,7 @@ static void tim4_setup(void)
     /* Enable TIM4 clock. */
     rcc_periph_clock_enable(RCC_TIM4);
     /* Reset TIM4 peripheral. */
-    timer_reset(TIM4);
+    rcc_periph_reset_pulse(RCC_APB1RSTR_TIM4RST);
     /* Timer global mode:
     * - Sampling clock divider 1
     * - Alignment edge
@@ -102,7 +102,7 @@ static void tim1_setup(void)
     /* Enable TIM1 clock. */
     rcc_periph_clock_enable(RCC_TIM1);
     /* Reset TIM1 peripheral. */
-    timer_reset(TIM1);
+    rcc_periph_reset_pulse(RCC_APB1RSTR_TIM4RST);
     /* Timer global mode:
     * - Deadtime/sampling clock divider 1
     * - Alignment edge
