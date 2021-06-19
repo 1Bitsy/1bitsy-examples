@@ -87,7 +87,7 @@ static int16_t next_sample(i2s_channel left_right)
 
 static void setup_clocks(void)
 {
-    rcc_clock_setup_hse_3v3(&CLOCK_SCALE);
+    rcc_clock_setup_pll(&CLOCK_SCALE);
 }
 
 static void setup_i2s(void)

@@ -26,7 +26,7 @@ static void setup_heartbeat(void)
 
 static void setup(void)
 {
-    rcc_clock_setup_hse_3v3(&MY_CLOCK);
+    rcc_clock_setup_pll(&MY_CLOCK);
 
     setup_systick(MY_CLOCK.ahb_frequency);
 

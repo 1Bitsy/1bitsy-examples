@@ -29,7 +29,7 @@
 
 static void clock_setup(void)
 {
-    rcc_clock_setup_hse_3v3(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
+    rcc_clock_setup_pll(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
 }
 
 static void gpiob6_setup(void)
