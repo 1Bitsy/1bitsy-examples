@@ -58,7 +58,7 @@ static int gen_sin_wave(uint8_t *buf, int len, int sample_offset, float samplera
 
 /*--------------------------------------------------------------------*/
 
-static int gen_square_wave(uint8_t *buf, int len, int sample_offset, float samplerate, float frequency, float amplitude)
+__attribute__((unused)) static int gen_square_wave(uint8_t *buf, int len, int sample_offset, float samplerate, float frequency, float amplitude)
 {
 	for (int i = 0; i < len; i++) {
 		if (fmodf((i + sample_offset), (samplerate / frequency)) < (samplerate / frequency / 2)) {
