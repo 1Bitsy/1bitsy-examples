@@ -69,7 +69,7 @@ static void gpio_setup(void)
 static void timer2_setup(void)
 {
 	rcc_periph_clock_enable(RCC_TIM2);
-	timer_reset(TIM2);
+	rcc_periph_reset_pulse(RCC_APB1RSTR_TIM2RST);
 
 	timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
 	timer_set_prescaler(TIM2, PRESCALE);     // TIM2_PSC = PRESCALE;  
