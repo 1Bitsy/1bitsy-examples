@@ -63,6 +63,8 @@ lib:
 	$(Q)$(MAKE) -C $(OPENCM3_DIR) lib TARGETS="stm32/f4"
 
 EXAMPLE_DIRS:=$(sort $(dir $(wildcard $(addsuffix /*/Makefile,$(addprefix examples/,$(TARGETS))))))
+COMMON_DIRS:=$(sort $(wildcard $(addsuffix /common,$(addprefix examples/,$(TARGETS)))))
+$(info $$COMMON_DIRS is [${COMMON_DIRS}])
 $(EXAMPLE_DIRS): lib
 	@printf "  BUILD   $@\n";
 	$(Q)$(MAKE) --directory=$@ OPENCM3_DIR=$(OPENCM3_DIR) $(EXAMPLE_RULES)
@@ -70,7 +72,7 @@ $(EXAMPLE_DIRS): lib
 examples: $(EXAMPLE_DIRS)
 	$(Q)true
 
-clean: $(EXAMPLE_DIRS:=.clean) styleclean
+clean: $(EXAMPLE_DIRS:=.clean) $(COMMON_DIRS:=.commonclean) styleclean
 	$(Q)$(MAKE) -C libopencm3 clean
 
 stylecheck: $(EXAMPLE_DIRS:=.stylecheck)
@@ -82,6 +84,10 @@ styleclean: $(EXAMPLE_DIRS:=.styleclean)
 		printf "  CLEAN   $*\n"; \
 		$(MAKE) -C $* clean OPENCM3_DIR=$(OPENCM3_DIR) || exit $?; \
 	fi;
+
+%.commonclean:
+	$(Q)printf "  CLEAN   $*\n"; \
+	rm -rf $*/*.o $*/*.d
 
 %.styleclean:
 	$(Q)$(MAKE) -C $* styleclean OPENCM3_DIR=$(OPENCM3_DIR)
