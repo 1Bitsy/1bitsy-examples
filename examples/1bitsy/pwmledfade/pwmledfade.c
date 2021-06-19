@@ -90,7 +90,7 @@ static void gpio_setup(void)
 static void tim_setup(void)
 {
 	/* Reset TIM1 peripheral. */
-	timer_reset(TIM1);
+	rcc_periph_reset_pulse(RCC_APB1RSTR_TIM12RST);
 	/* Timer global mode:
 	* - No divider
 	* - Alignment edge
